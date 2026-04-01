@@ -97,37 +97,6 @@ Coordinate Frames (ch02)
 
 ### Prerequisites
 - MATLAB R2022b or later (Simulink optional)
-- Git (for version control)
-- GitHub account
-
-### Clone and Run
-```bash
-git clone https://github.com/YOUR_USERNAME/AtlasFC.git
-cd AtlasFC
-```
-Open MATLAB, navigate to the project root, and run:
-```matlab
-addpath(genpath('core'));
-addpath(genpath('params'));
-addpath(genpath('tools'));
-```
-
-## Progress Tracker
-
-| Chapter | Topic                    | Study | MATLAB | Core Lib | Tests |
-|---------|--------------------------|-------|--------|----------|-------|
-| Ch.02   | Coordinate Frames        | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.03   | Kinematics & Dynamics    | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.04   | Forces & Moments         | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.05   | Trim & Linearization     | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.06   | Autopilot Design         | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.07   | Sensors                  | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.08   | Observers                | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.09   | State Estimation Design  | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.10   | Path Following           | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.11   | Path Planning            | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.12   | Advanced Path Planning   | [ ]   | [ ]    | [ ]      | [ ]   |
-| Ch.13   | Vision & Guidance        | [ ]   | [ ]    | [ ]      | [ ]   |
 
 ## License
 
