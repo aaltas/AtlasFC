@@ -1,0 +1,68 @@
+# ==========================
+# MATLAB / Simulink
+# ==========================
+*.asv
+*.m~
+*.mex*
+*.mlappinstall
+*.mlpkginstall
+slprj/
+*.slxc
+*.autosave
+codegen/
+*.mexmaci64
+*.mexmaca64
+*.mexw64
+*.mexa64
+
+# ==========================
+# Simulink Cache
+# ==========================
+*.slxc
+*.slxp
+
+# ==========================
+# C/C++ (future use)
+# ==========================
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.lib
+*.so
+*.dylib
+build/
+cmake-build-*/
+
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# ==========================
+# IDE
+# ==========================
+.vscode/
+.idea/
+
+# ==========================
+# Data & Logs
+# ==========================
+*.mat
+!params/*.mat
+*.log
+*.csv
+*.dat
+
+# ==========================
+# Python (legacy/tools)
+# ==========================
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
