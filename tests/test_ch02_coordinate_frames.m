@@ -8,10 +8,15 @@
 
 clear; clc;
 
-% --- Auto path setup ---
-this_dir   = fileparts(mfilename('fullpath'));
-atlas_root = fullfile(this_dir, '..');
-run(fullfile(atlas_root, 'setup_paths.m'));
+% --- Auto-path setup (pwd-based, avoids Mac Editor temp-path bug) ---
+atlas_root = fullfile(pwd, '..');
+addpath(atlas_root);
+setup_paths(atlas_root);
+
+clear; clc;
+atlas_root = fullfile(pwd, '..');
+addpath(atlas_root);
+setup_paths(atlas_root);
 tol = 1e-10;   % numerical tolerance
 passed = 0;
 failed = 0;

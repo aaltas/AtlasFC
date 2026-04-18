@@ -83,9 +83,43 @@ function params = mav_params()
     params.C_n_delta_a = -0.011;
     params.C_n_delta_r = -0.069;
 
-    % --- Propulsion ---
-    params.C_prop  = 1.0;          % propeller efficiency coefficient
-    params.k_motor = 80;           % motor constant
+    % --- Atmosphere ---
+    params.rho = 1.2682;           % kg/m^3 - air density at sea level
+
+    % --- Nonlinear Aerodynamic Model Parameters ---
+    params.M      = 50;            % blending sharpness for sigma(alpha)
+    params.alpha0 = 0.4712;        % rad (~27 deg) - stall angle of attack
+    % Aspect ratio (derived)
+    params.AR = params.b^2 / params.S_wing;  % = 15.29
+
+    % Nonlinear drag model: C_D(alpha) = C_Dp + (C_L0 + C_Lalpha*alpha)^2 / (pi*e*AR)
+    % C_Dp = parasitic drag coefficient at zero lift
+    params.C_D_p = 0.0;           % (set to 0; C_D_0 already includes it)
+
+    % --- Propulsion (Motor + Propeller model, Beard & McLain Ch.4) ---
+    % Propeller geometry
+    params.D_prop  = 0.508;        % m   - propeller diameter (20 inch)
+    % Propeller aerodynamic coefficient polynomial fits (C_T, C_Q vs. advance ratio J)
+    % Experimental data from Slide 32:  C_T(J) = C_T2*J^2 + C_T1*J + C_T0
+    params.C_T2    = -0.047394;
+    params.C_T1    = -0.13803;
+    params.C_T0    =  0.11221;
+    params.C_Q2    = -0.015729;
+    params.C_Q1    =  0.0031409;
+    params.C_Q0    =  0.006199;
+    % Motor constants
+    params.KV_RPM     = 145;       % RPM/V  - motor speed constant (nameplate rating)
+    params.KQ         = (1/145) * (60/(2*pi));  % N*m/A ≈ 0.0659 - torque constant
+    % Back-emf constant in SI units [V/(rad/s)].
+    % For an ideal DC motor KV_SI = KQ. Convert from RPM/V:
+    %   KV_SI = (60 / (2*pi)) / KV_RPM  =  KQ  ≈ 0.0659 V/(rad/s)
+    params.KV         = params.KQ; % V/(rad/s) - used in motor model b-coef
+    params.R_motor    = 0.042;     % Ohm   - motor winding resistance
+    params.i0         = 1.5;       % A     - no-load current
+    params.V_max      = 44.4;      % V     - maximum battery voltage
+    % Legacy simplified propulsion params (kept for backward compatibility)
+    params.C_prop  = 1.0;
+    params.k_motor = 80;
     params.S_prop  = 0.2027;       % m^2 - propeller disk area
     params.k_T_p   = 0.0;
     params.k_Omega = 0.0;

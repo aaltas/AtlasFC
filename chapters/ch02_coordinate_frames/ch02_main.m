@@ -17,9 +17,9 @@
 clear; close all; clc;
 
 % --- Auto path setup: find AtlasFC root from this file's location ---
-this_dir   = fileparts(mfilename('fullpath'));          % .../chapters/ch02_...
-atlas_root = fullfile(this_dir, '..', '..');            % AtlasFC root
-run(fullfile(atlas_root, 'setup_paths.m'));
+          % .../chapters/ch02_...
+atlas_root = fullfile(pwd, '..', '..');            % AtlasFC root
+setup_paths(atlas_root);
 
 fprintf('=== AtlasFC | Chapter 2: Coordinate Frames ===\n\n');
 %%

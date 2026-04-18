@@ -1,30 +1,44 @@
 % =========================================================================
 %  SETUP_PATHS - Add all AtlasFC project folders to MATLAB path
 % =========================================================================
-%  Can be called from any script using:
-%    run(fullfile(atlas_root, 'setup_paths.m'))
-%  Or run manually from the AtlasFC root:
-%    >> setup_paths
+%  Called from chapter scripts with the root path as argument:
+%    setup_paths(atlas_root)
+%
+%  Or run manually from the AtlasFC root directory:
+%    >> setup_paths(pwd)
+%
+%  NOTE: Accepts root as argument to avoid mfilename() temp-path bug
+%  on Mac when MATLAB Editor uses a temporary file copy.
 % =========================================================================
 
-project_root = fileparts(mfilename('fullpath'));
+function setup_paths(project_root)
 
-% Core library modules (the reusable flight controller building blocks)
-addpath(genpath(fullfile(project_root, 'core')));
+    if nargin < 1
+        % Fallback: called directly from AtlasFC root
+        project_root = pwd;
+    end
 
-% Aircraft and simulation parameters
-addpath(genpath(fullfile(project_root, 'params')));
+    % Resolve to absolute path
+    project_root = char(java.io.File(project_root).getCanonicalPath());
 
-% Shared plotting and analysis utilities
-addpath(genpath(fullfile(project_root, 'tools')));
+    % Core library modules
+    addpath(genpath(fullfile(project_root, 'core')));
 
-% Closed-loop simulation harness
-addpath(genpath(fullfile(project_root, 'simulation')));
+    % Aircraft and simulation parameters
+    addpath(genpath(fullfile(project_root, 'params')));
 
-% Unit tests
-addpath(genpath(fullfile(project_root, 'tests')));
+    % Shared utilities
+    addpath(genpath(fullfile(project_root, 'tools')));
 
-% Chapter study scripts (so chapter viewers can call each other if needed)
-addpath(genpath(fullfile(project_root, 'chapters')));
+    % Simulation harness
+    addpath(genpath(fullfile(project_root, 'simulation')));
 
-fprintf('[AtlasFC] Paths loaded. Root: %s\n', project_root);
+    % Unit tests
+    addpath(genpath(fullfile(project_root, 'tests')));
+
+    % Chapter scripts
+    addpath(genpath(fullfile(project_root, 'chapters')));
+
+    fprintf('[AtlasFC] Paths loaded. Root: %s\n', project_root);
+
+end
