@@ -6,7 +6,10 @@
 %  flight condition (Va*, gamma*, R*).
 %
 %  Trim optimization variables (straight-level flight):
-%    p_opt = [alpha, delta_e, delta_t]   (3 unknowns)
+%    p_opt = [alpha, delta_e, delta_t, delta_a]   (4 unknowns)
+%
+%  NOTE: delta_a is included to balance the motor reaction torque Q_p,
+%  which creates a rolling moment that must be compensated at trim.
 %
 %  Trim is defined by:
 %    Va_star    - desired airspeed [m/s]
@@ -33,10 +36,15 @@ function [x_trim, u_trim, info] = compute_trim(Va_star, gamma_star, R_star, para
     % -----------------------------------------------------------------------
     % 1. SET UP OPTIMIZER
     % -----------------------------------------------------------------------
-    % Initial guess:  small positive alpha, zero elevator, mid throttle
-    x0 = [0.05;     % alpha   [rad]
-          0.00;     % delta_e [rad]
-          0.50];    % delta_t [-]
+    % Physics-based initial guess
+    q_bar     = 0.5 * params.rho * Va_star^2;
+    CL_needed = (params.mass * params.gravity * cos(gamma_star)) / (q_bar * params.S_wing);
+    alpha_g   = max(0.01, (CL_needed - params.C_L_0) / params.C_L_alpha);
+    delta_e_g = -(params.C_m_0 + params.C_m_alpha * alpha_g) / params.C_m_delta_e;
+    x0 = [alpha_g;    % alpha   [rad]
+          delta_e_g;  % delta_e [rad]
+          0.75;       % delta_t [-]  (start higher — low throttle gives near-zero thrust at Va=25)
+          0.00];      % delta_a [rad]
 
     % Cost function wrapper
     cost_fn = @(x_opt) trim_residuals(x_opt, Va_star, gamma_star, R_star, params);
@@ -55,8 +63,9 @@ function [x_trim, u_trim, info] = compute_trim(Va_star, gamma_star, R_star, para
     alpha   = x_opt(1);
     delta_e = x_opt(2);
     delta_t = x_opt(3);
+    delta_a = x_opt(4);
 
-    % Clamp delta_t to physical limits
+    % Clamp to physical limits
     delta_t = max(0, min(1, delta_t));
 
     % -----------------------------------------------------------------------
@@ -99,13 +108,24 @@ function [x_trim, u_trim, info] = compute_trim(Va_star, gamma_star, R_star, para
     % 4. TRIM CONTROL INPUTS
     % -----------------------------------------------------------------------
     u_trim = [delta_e;   % elevator [rad]
-              0;         % aileron  [rad]
-              0;         % rudder   [rad]
-              delta_t];  % throttle [-]
+              delta_a;  % aileron  [rad]  (balances motor reaction torque)
+              0;        % rudder   [rad]
+              delta_t]; % throttle [-]
 
     % -----------------------------------------------------------------------
     % 5. DIAGNOSTICS
     % -----------------------------------------------------------------------
+    % Evaluate individual residuals at solution for debugging
+    e_dbg   = euler_to_quaternion(0, theta, 0);
+    x13_dbg = [0; 0; params.pd0; u_b; v_b; w_b; e_dbg; 0; 0; 0];
+    u_trim_dbg = [delta_e; delta_a; 0; delta_t];
+    [fm_dbg, ~, ~, ~] = forces_moments(x13_dbg, u_trim_dbg, zeros(3,1), zeros(3,1), params);
+    xd_dbg  = mav_derivatives(x13_dbg, fm_dbg, params);
+    info.u_dot = xd_dbg(4);
+    info.w_dot = xd_dbg(6);
+    info.q_dot = xd_dbg(12);
+    info.p_dot = xd_dbg(11);
+
     info.alpha     = alpha;
     info.theta     = theta;
     info.Va        = Va_star;

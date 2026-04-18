@@ -58,6 +58,12 @@ else
     fprintf('[WARNING: cost above threshold]\n');
 end
 
+fprintf('  Residual breakdown:\n');
+fprintf('    u_dot = %+.4f m/s^2  (thrust-drag balance)\n', info.u_dot);
+fprintf('    w_dot = %+.4f m/s^2  (lift-weight balance)\n', info.w_dot);
+fprintf('    q_dot = %+.4f rad/s^2 (pitch moment)\n',       info.q_dot);
+fprintf('    p_dot = %+.4f rad/s^2 (roll moment / motor torque)\n', info.p_dot);
+
 fprintf('\n  Trim state:\n');
 fprintf('    Va      = %.4f m/s\n', info.Va);
 fprintf('    alpha   = %.4f deg\n', rad2deg(info.alpha));
@@ -66,7 +72,7 @@ fprintf('    phi     = %.4f deg\n', rad2deg(x_trim(7)));
 
 fprintf('\n  Trim inputs:\n');
 fprintf('    delta_e = %.4f rad  (%.2f deg)\n', u_trim(1), rad2deg(u_trim(1)));
-fprintf('    delta_a = %.4f rad\n', u_trim(2));
+fprintf('    delta_a = %.4f rad  (%.2f deg)\n', u_trim(2), rad2deg(u_trim(2)));
 fprintf('    delta_r = %.4f rad\n', u_trim(3));
 fprintf('    delta_t = %.4f  (%.1f%%)\n', u_trim(4), u_trim(4)*100);
 
@@ -244,4 +250,3 @@ fprintf('    alpha*  = %.3f deg\n',      rad2deg(tf.alpha_star));
 fprintf('    theta*  = %.3f deg\n',      rad2deg(tf.theta_star));
 fprintf('    delta_t*= %.3f (%.1f%%)\n', tf.delta_t_star, tf.delta_t_star*100);
 fprintf('    delta_e*= %.4f rad\n',      tf.delta_e_star);
-fprintf('\n  Ready for Chapter 6: Autopilot Design.\n\n');

@@ -16,15 +16,16 @@
 %    - beta = 0, phi = 0  (lateral symmetry)
 %    - p = q = r = 0      (no rotation at trim)
 %    - theta = alpha + gamma
-%    - delta_a = delta_r = 0
+%    - delta_r = 0
 %
 %  Optimization variables (for straight-level trim):
 %    x_opt(1) = alpha   [rad]  angle of attack
 %    x_opt(2) = delta_e [rad]  elevator deflection
 %    x_opt(3) = delta_t [-]    throttle  (0-1)
+%    x_opt(4) = delta_a [rad]  aileron   (balances motor reaction torque)
 %
 %  Inputs:
-%    x_opt    - [3x1] optimization variables [alpha; delta_e; delta_t]
+%    x_opt    - [4x1] optimization variables [alpha; delta_e; delta_t; delta_a]
 %    Va_star  - desired airspeed [m/s]
 %    gamma_star - desired flight-path angle [rad] (0 = level)
 %    R_star   - desired turn radius [m] (inf = straight)
@@ -43,6 +44,7 @@ function J = trim_residuals(x_opt, Va_star, gamma_star, R_star, params)
     alpha   = x_opt(1);
     delta_e = x_opt(2);
     delta_t = x_opt(3);
+    delta_a = x_opt(4);
 
     % --- Trim geometry (straight flight, symmetric) ---
     beta  = 0;
@@ -78,7 +80,7 @@ function J = trim_residuals(x_opt, Va_star, gamma_star, R_star, params)
            p_r; q_r; r_r];           % angular rates
 
     % --- Control inputs ---
-    delta = [delta_e; 0; 0; delta_t];   % [delta_e, delta_a, delta_r, delta_t]
+    delta = [delta_e; delta_a; 0; delta_t];   % [delta_e, delta_a, delta_r, delta_t]
 
     % --- Forces and moments (no wind at trim) ---
     [fm, ~, ~, ~] = forces_moments(x13, delta, zeros(3,1), zeros(3,1), params);
@@ -93,7 +95,15 @@ function J = trim_residuals(x_opt, Va_star, gamma_star, R_star, params)
     q_dot = xdot(12);
     r_dot = xdot(13);
 
-    % --- Scalar cost (sum of squared residuals) ---
-    J = u_dot^2 + v_dot^2 + w_dot^2 + p_dot^2 + q_dot^2 + r_dot^2;
+    % --- Scalar cost: only the 4 residuals controllable by our 4 variables ---
+    %   alpha   → w_dot  (angle of attack sets lift)
+    %   delta_t → u_dot  (throttle sets thrust)
+    %   delta_e → q_dot  (elevator sets pitch moment)
+    %   delta_a → p_dot  (aileron balances motor reaction torque)
+    %
+    %   v_dot and r_dot are excluded: for straight symmetric flight
+    %   (beta=0, delta_r=0) these are structurally zero and cannot be
+    %   controlled by the 4 optimization variables above.
+    J = u_dot^2 + w_dot^2 + q_dot^2 + p_dot^2;
 
 end
