@@ -83,19 +83,15 @@ function J = trim_residuals(x_opt, Va_star, gamma_star, R_star, params)
     % --- Forces and moments (no wind at trim) ---
     [fm, ~, ~, ~] = forces_moments(x13, delta, zeros(3,1), zeros(3,1), params);
 
-    Fx = fm(1);  Fy = fm(2);  Fz = fm(3);
-    l  = fm(4);  m_mom = fm(5);  n  = fm(6);
+    % --- All accelerations via shared dynamics equations ---
+    xdot  = mav_derivatives(x13, fm, params);
 
-    % --- Translational acceleration residuals ---
-    m_mass = params.mass;
-    u_dot  = r_r*v_b  - q_r*w_b + Fx / m_mass;
-    v_dot  = p_r*w_b  - r_r*u_b + Fy / m_mass;
-    w_dot  = q_r*u_b  - p_r*v_b + Fz / m_mass;
-
-    % --- Rotational acceleration residuals (Euler equations) ---
-    p_dot = params.Gamma1*p_r*q_r - params.Gamma2*q_r*r_r + params.Gamma3*l  + params.Gamma4*n;
-    q_dot = params.Gamma5*p_r*r_r - params.Gamma6*(p_r^2 - r_r^2)            + m_mom / params.Jy;
-    r_dot = params.Gamma7*p_r*q_r - params.Gamma1*q_r*r_r + params.Gamma4*l  + params.Gamma8*n;
+    u_dot = xdot(4);   % translational
+    v_dot = xdot(5);
+    w_dot = xdot(6);
+    p_dot = xdot(11);  % rotational
+    q_dot = xdot(12);
+    r_dot = xdot(13);
 
     % --- Scalar cost (sum of squared residuals) ---
     J = u_dot^2 + v_dot^2 + w_dot^2 + p_dot^2 + q_dot^2 + r_dot^2;

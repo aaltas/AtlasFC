@@ -65,14 +65,8 @@ state_log(:, 1) = state0;
 state = state0;
 
 for k = 2 : N
-    % Extract quaternion → R_v^b (inertial to body) to rotate gravity
-    e0 = state(7);  e1 = state(8);  e2 = state(9);  e3 = state(10);
-
-    R_vb = [e1^2+e0^2-e2^2-e3^2,  2*(e1*e2+e0*e3),       2*(e1*e3-e0*e2);
-             2*(e1*e2-e0*e3),      e0^2-e1^2+e2^2-e3^2,   2*(e2*e3+e0*e1);
-             2*(e1*e3+e0*e2),      2*(e2*e3-e0*e1),        e0^2-e1^2-e2^2+e3^2];
-
-    % Gravity in NED inertial frame [N], then rotate to body frame
+    % Rotate gravity from inertial (NED) to body frame
+    R_vb       = quaternion_to_rotation(state(7:10));
     f_grav_body = R_vb * [0; 0; m * g];
 
     % No aerodynamics → moments = 0

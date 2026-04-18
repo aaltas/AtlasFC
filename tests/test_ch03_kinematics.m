@@ -32,9 +32,6 @@ atlas_root = fullfile(pwd, '..');
 addpath(atlas_root);
 setup_paths(atlas_root);
 
-atlas_root = fullfile(this_dir, '..');
-setup_paths(atlas_root);
-
 fprintf('\n========================================\n');
 fprintf('  AtlasFC -- Test Suite: Chapter 3\n');
 fprintf('========================================\n\n');

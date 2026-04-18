@@ -11,13 +11,10 @@
 %    6. Full coordinate frame transformation chain
 %    7. 3D MAV visualization animation
 %
-%  Run from anywhere — paths are resolved automatically.
 % =========================================================================
 
 clear; close all; clc;
 
-% --- Auto path setup: find AtlasFC root from this file's location ---
-          % .../chapters/ch02_...
 atlas_root = fullfile(pwd, '..', '..');            % AtlasFC root
 setup_paths(atlas_root);
 

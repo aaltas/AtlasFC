@@ -33,16 +33,10 @@
 
 function fg = gravity_force(e, params)
 
-    e0 = e(1);
-    ex = e(2);   % e1
-    ey = e(3);   % e2
-    ez = e(4);   % e3
+    mg   = params.mass * params.gravity;
 
-    mg = params.mass * params.gravity;
-
-    % Third column of R_v^b times [0;0;mg]  (Slide 5, quaternion form)
-    fg = mg * [ 2*(ex*ez - ey*e0);
-                2*(ey*ez + ex*e0);
-                ez^2 + e0^2 - ex^2 - ey^2 ];
+    % Rotate gravity from inertial (NED) to body frame
+    R_vb = quaternion_to_rotation(e);
+    fg   = R_vb * [0; 0; mg];
 
 end

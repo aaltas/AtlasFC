@@ -61,9 +61,7 @@ function [fm, Va, alpha, beta] = forces_moments(state, delta, wind_i, wind_b, pa
     %    V_wind^b = R_v^b * V_wind^i + V_gust^b
     % -----------------------------------------------------------------------
     % Rotation matrix R_v^b (inertial → body) from quaternion
-    R_vb = [(e1^2+e0^2-e2^2-e3^2), 2*(e1*e2+e0*e3),       2*(e1*e3-e0*e2);
-             2*(e1*e2-e0*e3),       (e0^2-e1^2+e2^2-e3^2), 2*(e2*e3+e0*e1);
-             2*(e1*e3+e0*e2),       2*(e2*e3-e0*e1),        (e0^2-e1^2-e2^2+e3^2)];
+    R_vb = quaternion_to_rotation([e0; e1; e2; e3]);
 
     % Wind in body frame: steady (rotated from NED) + gust
     V_wind_body = R_vb * wind_i + wind_b;   % [3x1]
