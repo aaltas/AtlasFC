@@ -22,7 +22,15 @@ function setup_paths(project_root)
     project_root = char(java.io.File(project_root).getCanonicalPath());
 
     % Core library modules
-    addpath(genpath(fullfile(project_root, 'core')));
+    % genpath adds all subfolders — but ekf_v1/, ekf_v2/ etc. must NOT be
+    % added blindly (they contain conflicting function names).
+    % ekf_select.m handles versioned EKF path management at runtime.
+    core_paths = genpath(fullfile(project_root, 'core'));
+    core_paths = remove_ekf_versions(core_paths, project_root);
+    addpath(core_paths);
+
+    % Default EKF version for chapter scripts and direct calls
+    addpath(fullfile(project_root, 'core', 'estimator', 'ekf_v1'));
 
     % Aircraft and simulation parameters
     addpath(genpath(fullfile(project_root, 'params')));
@@ -41,4 +49,24 @@ function setup_paths(project_root)
 
     fprintf('[AtlasFC] Paths loaded. Root: %s\n', project_root);
 
+end
+
+% -------------------------------------------------------------------------
+function filtered = remove_ekf_versions(path_str, project_root)
+% Remove ekf_vN subfolders from a genpath string so that versioned EKF
+% functions don't conflict.  ekf_select.m adds the correct version at runtime.
+    estimator_root = fullfile(project_root, 'core', 'estimator');
+    entries  = strsplit(path_str, pathsep);
+    keep     = true(1, numel(entries));
+    for i = 1:numel(entries)
+        e = entries{i};
+        % Drop any folder that is a direct child of estimator/ and matches ekf_vN
+        if strncmp(e, estimator_root, length(estimator_root))
+            rel = e(length(estimator_root)+1:end);
+            if ~isempty(regexp(rel, ['^' regexptranslate('escape', filesep) 'ekf_v\d'], 'once'))
+                keep(i) = false;
+            end
+        end
+    end
+    filtered = strjoin(entries(keep), pathsep);
 end

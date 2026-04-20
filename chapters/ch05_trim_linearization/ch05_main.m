@@ -250,3 +250,27 @@ fprintf('    alpha*  = %.3f deg\n',      rad2deg(tf.alpha_star));
 fprintf('    theta*  = %.3f deg\n',      rad2deg(tf.theta_star));
 fprintf('    delta_t*= %.3f (%.1f%%)\n', tf.delta_t_star, tf.delta_t_star*100);
 fprintf('    delta_e*= %.4f rad\n',      tf.delta_e_star);
+
+% =========================================================================
+%  SAVE TRIM DATA — used by Ch.6, Ch.7, Ch.8
+% =========================================================================
+%  Saved variables:
+%    x_trim     [12x1]  trim state vector
+%    u_trim     [4x1]   trim control inputs [de, da, dr, dt]
+%    tf_s       struct  transfer function coefficients
+%    gains      struct  PID autopilot gains (computed once here)
+%    Va_star    [m/s]   trim airspeed
+%    gamma_star [rad]   trim flight path angle
+%    R_star     [m]     trim turn radius
+% =========================================================================
+tf_s  = tf;   % rename to conventional name used in Ch.6+
+gains = autopilot_gains(tf_s, params);
+
+% which('mav_params') returns absolute path of the function — reliable
+% regardless of MATLAB's current working directory.
+params_dir = fileparts(which('mav_params'));
+trim_file  = fullfile(params_dir, 'trim_data.mat');
+save(trim_file, 'x_trim', 'u_trim', 'tf_s', 'gains', ...
+                'Va_star', 'gamma_star', 'R_star');
+fprintf('\n  Trim data saved → %s\n', trim_file);
+fprintf('  (Loaded automatically by Ch.6, Ch.7, Ch.8)\n\n');
